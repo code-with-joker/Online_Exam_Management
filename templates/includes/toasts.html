@@ -1,0 +1,329 @@
+{% if messages %}
+<!-- Message custom -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% for message in messages %}
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: '{% if message.tags == "success" %}success{% elif message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% elif message.tags == "info" %}info{% else %}question{% endif %}',
+            title: "{{ message|escapejs }}",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: `{% if message.tags == 'success' %}#d4edda{% elif message.tags == 'error' %}#f8d7da{% elif message.tags == 'info' %}#d1ecf1{% else %}#ffffff{% endif %}`,
+                    color: '#155724',
+            customClass: {
+                popup: 'rounded-lg shadow-lg',
+                title: 'font-semibold',
+                icon: 'swal2-icon swal2-icon-success'
+            },
+            backdrop: true,
+            showCloseButton: true,
+            closeButtonAriaLabel: 'Close',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+        });
+    {% endfor %}
+});
+</script>
+{% endif %}
+
+<!-- Dropdown Duty icon rotate -->
+<script>
+    const assignButton = document.getElementById('assignDutyButton');
+    const assignDropdown = document.getElementById('assignDutyDropdown');
+    const arrowIcon = document.getElementById('arrowIcon');
+    
+    assignButton.addEventListener('click', () => {
+        assignDropdown.classList.toggle('hidden');
+        arrowIcon.classList.toggle('rotate-180');
+    });
+    
+    // Close dropdown if clicked outside
+    document.addEventListener('click', function(event) {
+        if (!assignButton.contains(event.target) && !assignDropdown.contains(event.target)) {
+            assignDropdown.classList.add('hidden');
+            arrowIcon.classList.remove('rotate-180');
+        }
+    });
+</script>
+
+
+<!-- Function to confirm deletion of a subject-->
+<script>
+  function confirmDelete(id, name) {
+    Swal.fire({
+      title: `Delete "${name}"?`,
+      text: "This action cannot be undone!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e3342f',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, Delete it!',
+      preConfirm: () => {
+        Swal.fire({
+          title: 'Deleting...',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+        // Delay to allow the loader to appear before redirect
+        setTimeout(() => {
+          window.location.href = "/delete_subject/" + id + "/";
+        }, 800);
+      }
+    });
+  }
+</script>
+
+<!-- Function to confirm deletion of a department-->
+<script>
+  // Auto-hide toast after 3 seconds
+  setTimeout(() => {
+      const toast = document.getElementById('toast');
+      if (toast) {
+          toast.style.display = 'none';
+      }
+  }, 3000);
+
+  // Confirm deletion with loader
+  function openDeleteModal(id, name) {
+      Swal.fire({
+          title: `Are you sure you want to delete ${name}?`,
+          text: "This action cannot be undone!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          preConfirm: () => {
+              Swal.fire({
+                  title: 'Deleting...',
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  didOpen: () => {
+                      Swal.showLoading();
+                  }
+              });
+              setTimeout(() => {
+                  window.location.href = '/delete_department/' + id + '/';
+              }, 1000); // Small delay to show loading effect
+          }
+      });
+  }
+</script>
+
+
+<!-- Function to confirm deletion of a student subject-->
+<script>
+    function confirmDeleteSubject(id, subjectName, name) {
+        Swal.fire({
+            title: `Delete subject ${subjectName} for ${name}?`,
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Delete it!',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#e3342f',
+            cancelButtonColor: '#6c757d',
+            preConfirm: () => {
+                Swal.fire({
+                    title: 'Deleting...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                setTimeout(() => {
+                    document.getElementById('delete-form-' + id).submit();
+                }, 800);
+            }
+        });
+    }
+</script>
+
+
+<!-- Function to update student detail -->
+<script>
+    function openProfileForm() {
+      Swal.fire({
+        title: 'Edit Profile',
+        width: '60em', // Increase form width
+        html: `
+          <form id="profileForm" enctype="multipart/form-data">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+              <div>
+                <label class="block font-semibold mb-1">Email</label>
+                <input type="email" name="email" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Email" required value="{{ student.email|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Mobile</label>
+                <input type="text" name="mobile" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Mobile" required pattern="^[6-9]\\d{9}$" value="{{ student.mobile|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Gender</label>
+                <input type="text" name="gender" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Gender" required value="{{ student.gender|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Father's Name</label>
+                <input type="text" name="father_name" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Father Name" required value="{{ student.father_name|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Mother's Name</label>
+                <input type="text" name="mother_name" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Mother Name" required value="{{ student.mother_name|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Father Mobile</label>
+                <input type="text" name="father_mobile" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Father Mobile" required pattern="^[6-9]\\d{9}$" value="{{ student.father_mobile|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Blood Group</label>
+                <input type="text" name="blood_group" class="w-full p-2 border border-gray-300 rounded-md" placeholder="A+, B-, etc." required pattern="^(A|B|AB|O)[+-]$" value="{{ student.blood_group|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Semester</label>
+                <input type="text" name="semester" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Semester" required value="{{ student.semester|default:'' }}">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">New Password</label>
+                <input type="password" name="password" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Leave blank if unchanged">
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Profile Picture</label>
+                <input type="file" name="profile_pic" class="w-full p-2 border border-gray-300 rounded-md">
+              </div>
+            </div>
+          </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Update',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#22c55e',
+        cancelButtonColor: '#ef4444',
+        preConfirm: () => {
+          const form = document.getElementById('profileForm');
+          const formData = new FormData(form);
+  
+          return fetch("{% url 'update_student_profile' %}", {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: formData
+          }).then(response => response.json()).then(data => {
+            if (data.success) {
+              Swal.fire('Updated!', 'Your profile was updated successfully.', 'success').then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.showValidationMessage('Update failed.');
+            }
+          }).catch(() => {
+            Swal.showValidationMessage('Server error.');
+          });
+        }
+      });
+    }
+</script>
+
+<!-- Function to confirm logout of a student-->
+<script>
+  function confirmLogout() {
+      Swal.fire({
+          title: 'Are you sure?',
+          text: "You will be logged out from your account.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Logout',
+          cancelButtonText: 'Cancel',
+          customClass: {
+              confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2',
+              cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded'
+          },
+          buttonsStyling: false,
+          preConfirm: () => {
+              Swal.fire({
+                  title: 'Logging out...',
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  didOpen: () => {
+                      Swal.showLoading();
+                  }
+              });
+              // Delay to show loader before redirecting
+              setTimeout(() => {
+                  window.location.href = "{% url 'student_logout' %}";
+              }, 800);
+          }
+      });
+  }
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    
+    // ✅ Form submit loader
+    const form = document.getElementById('add-institute-form');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        Swal.fire({
+          title: 'Adding Institute...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Submit after short delay to show loader
+        setTimeout(() => form.submit(), 500);
+      });
+    }
+
+    // ✅ Delete confirmation with loader
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function (e) {
+        e.preventDefault();
+        const deleteUrl = this.dataset.deleteUrl;
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "This action cannot be undone!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: 'Deleting...',
+              allowOutsideClick: false,
+              didOpen: () => Swal.showLoading()
+            });
+            setTimeout(() => {
+              window.location.href = deleteUrl;
+            }, 700);
+          }
+        });
+      });
+    });
+
+  });
+</script>
+
+    
+
+
+       

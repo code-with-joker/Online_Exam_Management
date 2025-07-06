@@ -1,0 +1,205 @@
+{% load static tailwind_tags %}
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <title>{% block title %}Exam Management System{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'img/college_logo.png' %}">
+
+
+    
+    <!-- Include TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class', // Enable dark mode using 'class'
+      }
+    </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white flex flex-col min-h-screen">
+
+<!-- Navbar Start -->
+<nav class="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center gap-3">
+                <img src="{% static 'img/college_logo.png' %}" alt="Logo" class="h-10 w-10 rounded-full object-cover">
+                
+                <a href="{% url 'admin' %}" class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Admin Dashboard
+                </a>
+            </div>
+            
+            <!-- Hamburger Button for Mobile -->
+            <div class="flex md:hidden">
+                <button id="mobile-menu-button" class="text-gray-800 dark:text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Desktop Menu (hidden on mobile) -->
+            <div class="hidden md:flex space-x-4 items-center">
+                <a href="{% url 'manage_student_subjects' %}" class="nav-link {% if request.path == 'manage_student_subjects' %}bg-gray-200 dark:bg-gray-700{% endif %}">Add BackPaper</a>
+                <a href="{% url 'manage_departments' %}" class="nav-link {% if request.path == 'manage_departments' %}bg-gray-200 dark:bg-gray-700{% endif %}">Add Branch</a>
+                <a href="{% url 'student_list' %}" class="nav-link {% if request.path == 'student_list' %}bg-gray-200 dark:bg-gray-700{% endif %}">Add Students</a>
+                <a href="{% url 'manage_institute' %}" class="nav-link {% if request.path == 'manage_institute' %}bg-gray-200 dark:bg-gray-700{% endif %}">Add Institute</a>
+                <a href="{% url 'manage_subjects' %}" class="nav-link {% if request.path == 'manage_subjects' %}bg-gray-200 dark:bg-gray-700{% endif %}">Add Subjects</a>
+                <a href="{% url 'admin_receipt_requests' %}" class="nav-link {% if request.path == 'admin_receipt_requests' %}bg-gray-200 dark:bg-gray-700{% endif %}">Manage Receipt</a>
+                <!-- Dropdown -->
+                <div class="relative">
+                    <button id="assignDutyButton" class="nav-link flex items-center gap-1 focus:outline-none">
+                        Assign Duty
+                        <svg id="arrowIcon" class="w-4 h-4 transform transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="assignDutyDropdown" class="absolute hidden bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 mt-2 rounded shadow-lg transition-all duration-300 ease-in-out origin-top min-w-[10rem] z-50">
+                        <a href="{% url 'invigilator_duties' %}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Assign New Duty</a>
+                        <a href="{% url 'duty_detail' %}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Manage Details</a>
+                        <a href="{% url 'manage_exam_details' %}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Manage Exam-Admit Details</a>
+                    </div>
+                </div>
+                <a href="{% url 'admin_logout' %}" class="nav-link {% if request.path == 'admin_receipt_requests' %}bg-gray-200 dark:bg-gray-700{% endif %}">Logout</a>
+                <!-- Dark Mode Toggle Button -->
+                <button id="dark-toggle" class="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600 transition">
+                    <svg id="sun-icon" class="w-5 h-5 text-yellow-500 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM4.22 5.22a1 1 0 011.42 0L7 6.59a1 1 0 01-1.42 1.42L4.22 6.64a1 1 0 010-1.42zM16.24 17.24a1 1 0 01-1.42 0l-1.36-1.36a1 1 0 011.42-1.42l1.36 1.36a1 1 0 010 1.42zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zM16 9a1 1 0 000 2h1a1 1 0 100-2h-1zM4.22 14.78a1 1 0 011.42 0L7 16.59a1 1 0 11-1.42 1.42l-1.36-1.36a1 1 0 010-1.42zM17.24 4.22a1 1 0 00-1.42 0l-1.36 1.36a1 1 0 001.42 1.42l1.36-1.36a1 1 0 000-1.42z" />
+                    </svg>
+                    <svg id="moon-icon" class="hidden w-5 h-5 text-gray-100 dark:block" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293a8 8 0 01-10.586-10.586 8 8 0 1010.586 10.586z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu (hidden by default) -->
+     
+    <div id="mobile-menu" class="md:hidden hidden  mt-4 px-2 text-center">
+        <div class="flex flex-col space-y-2">
+        <a href="{% url 'manage_student_subjects' %}" class="text-gray-700 dark:text-white">Add BackPaper</a>
+        <a href="{% url 'manage_departments' %}" class="text-gray-700 dark:text-white">Add Branch</a>
+        <a href="{% url 'student_list' %}" class="text-gray-700 dark:text-white">Add Students</a>
+        <a href="{% url 'manage_institute' %}" class="text-gray-700 dark:text-white">Add Institute</a>
+        <a href="{% url 'manage_subjects' %}" class="text-gray-700 dark:text-white">Add Subjects</a>
+        <a href="{% url 'admin_receipt_requests' %}" class="text-gray-700 dark:text-white">Manage Receipt</a>
+        <a href="{% url 'invigilator_duties' %}" class="text-gray-700 dark:text-white">Assign New Duty</a>
+        <a href="{% url 'duty_detail' %}" class="text-gray-700 dark:text-white">Manage Details</a>
+        <a href="{% url 'manage_exam_details' %}" class="text-gray-700 dark:text-white">Manage Exam-Admit Details</a>
+        <a href="{% url 'admin_logout' %}" class="text-red-600 font-semibold">Logout</a>
+    </div>
+    </div>
+</nav>
+
+<!-- Script to handle hamburger and mobile menu toggle -->
+<script>
+  // Mobile menu toggle
+  document.getElementById('mobile-menu-button').addEventListener('click', () => {
+    document.getElementById('mobile-menu').classList.toggle('hidden');
+  });
+</script>
+
+<!-- Navbar End -->
+
+<!-- Main Content -->
+<main class="flex-grow container mx-auto p-6">
+    {% block content %}
+    
+    {% endblock %}
+</main>
+
+<!-- Toast Content -->
+
+{% include 'includes/toasts.html' %}
+<!-- Toast Content End -->
+
+
+<!-- Footer -->
+<footer class="bg-black shadow-inner py-6">
+    <div class="container mx-auto text-center text-white text-sm space-y-1">
+        <p>© 2025 <span class="font-semibold text-gray-300">Exam Management System</span>. All Rights Reserved.</p>
+        <p class="text-gray-400 italic">Designed & Developed by <span class="text-blue-400 font-medium">Kishan Kumar</span> & <span class="text-blue-400 font-medium">Priyanshu Pandey</span></p>
+    </div>
+</footer>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Check for saved mode preference in localStorage
+    const currentMode = localStorage.getItem('darkMode') === 'true' ? 'dark' : 'light';
+    const htmlElement = document.documentElement;
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    // Apply saved theme on page load
+    if (currentMode === 'dark') {
+        htmlElement.classList.add('dark');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+    } else {
+        htmlElement.classList.remove('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+    }
+
+    // Dark Mode Toggle Logic
+    const toggleButton = document.getElementById('dark-toggle');
+
+    toggleButton.addEventListener('click', () => {
+        // Toggle dark mode class
+        htmlElement.classList.toggle('dark');
+
+        // Toggle icons visibility
+        sunIcon.classList.toggle('hidden');
+        moonIcon.classList.toggle('hidden');
+
+        // Save preference in localStorage
+        const isDarkMode = htmlElement.classList.contains('dark');
+        localStorage.setItem('darkMode', isDarkMode);
+
+        // SweetAlert Notification
+        if (isDarkMode) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Dark Mode Enabled!',
+                toast: true,
+                position: 'top-end',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'Light Mode Enabled!',
+                toast: true,
+                position: 'top-end',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    });
+</script>
+
+<style>
+    /* Custom Tailwind Classes */
+    .nav-link {
+        @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition;
+    }
+</style>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+</body>
+</html>

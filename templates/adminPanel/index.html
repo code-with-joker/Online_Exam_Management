@@ -1,0 +1,195 @@
+{% extends 'adminPanel/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard | Admin Panel{% endblock %}
+
+
+{% block content %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+
+    <!-- Total Students -->
+    <div class="bg-blue-100 p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300 flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">
+                Total Students</h3>
+            <p class="text-3xl font-bold text-blue-900">{{ student_count }}</p>
+        </div>
+        <i class="bi bi-people text-4xl text-blue-800"></i>
+    </div>
+
+    <!-- Total Teachers -->
+    <div class="bg-green-100 p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300 flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-semibold text-green-800 mb-2">Total Teachers</h3>
+            <p class="text-3xl font-bold text-green-900">{{ teacher_count }}</p>
+        </div>
+        <i class="bi bi-person-workspace text-4xl text-green-800"></i>
+    </div>
+
+    <!-- Back Paper Students -->
+    <div class="bg-red-100 p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300 flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-semibold text-red-800 mb-2">Back Paper Students</h3>
+            <p class="text-3xl font-bold text-red-900">{{ backpaper_student_count }}</p>
+        </div>
+        <i class="bi bi-journal-x text-4xl text-red-800"></i>
+    </div>
+
+</div>
+{% if reminders %}
+<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-md">
+    <h3 class="font-semibold text-lg mb-2">Reminders:</h3>
+    <ul class="list-disc pl-5">
+        {% for note in reminders %}
+            <li>{{ note }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="bg-white p-6 rounded-xl shadow-md mt-6">
+    <h3 class="text-xl font-semibold mb-4">✅ Recent Activities</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Recent Students -->
+        <div>
+            <h4 class="font-semibold text-lg mb-2">🧑‍🎓 Students</h4>
+            <ul class="space-y-2">
+                {% for student in recent_students %}
+                    <li>
+                        <span class=" bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                            <i class="bi bi-person-fill"></i> {{ student.name }}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="text-gray-500 text-sm">No recent students.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Recent Teachers -->
+        <div>
+            <h4 class="font-semibold text-lg mb-2">👨‍🏫 Teachers</h4>
+            <ul class="space-y-2">
+                {% for teacher in recent_teachers %}
+                    <li>
+                        <span class=" bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                            <i class="bi bi-person-badge"></i> {{ teacher.name }}
+                        </span>
+                    </li>
+                {% empty %}
+                    <li class="text-gray-500 text-sm">No recent teachers.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+    <!-- Pie Chart -->
+    <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+        <h3 class="text-sm font-semibold mb-2 text-center">Statistics</h3>
+        <div class="w-40 h-40">
+            <canvas id="statsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Student Distribution Chart -->
+    <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+        <h3 class="text-sm font-semibold mb-2 text-center">Students by Branch</h3>
+        <div class="w-40 h-40">
+            <canvas id="branchChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Subject Count Chart -->
+    <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+        <h3 class="text-sm font-semibold mb-2 text-center">Subjects / Semester</h3>
+        <div class="w-40 h-40">
+            <canvas id="semesterChart"></canvas>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // PIE CHART
+    const statsChart = new Chart(document.getElementById('statsChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Students', 'Teachers', 'Back Paper Students'],
+            datasets: [{
+                data: [{{ student_count }}, {{ teacher_count }}, {{ backpaper_student_count }}],
+                backgroundColor: ['#3B82F6', '#10B981', '#EF4444'],
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 10 } }
+                }
+            }
+        }
+    });
+
+    // BAR CHART - BRANCH
+    new Chart(document.getElementById('branchChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ branch_labels|safe }},
+            datasets: [{
+                label: 'Students',
+                data: {{ branch_counts|safe }},
+                backgroundColor: '#3B82F6',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+
+    // LINE CHART - SEMESTER
+    new Chart(document.getElementById('semesterChart'), {
+        type: 'line',
+        data: {
+            labels: {{ semester_labels|safe }},
+            datasets: [{
+                label: 'Subjects',
+                data: {{ subject_counts|safe }},
+                backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                borderColor: 'rgba(5, 150, 105, 1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

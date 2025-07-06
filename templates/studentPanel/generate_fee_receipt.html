@@ -1,0 +1,41 @@
+<!-- studentPanel/templates/studentPanel/generate_fee_receipt.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate Fee Receipt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+        <h2 class="text-2xl font-bold mb-6">Fee Receipt for {{ student.name }}</h2>
+
+        <h3 class="text-xl font-semibold mb-2">Subjects:</h3>
+        <ul class="list-disc ml-5 mb-4">
+            {% for subject in subjects %}
+                <li>{{ subject.name }}</li>
+            {% empty %}
+                <li>No subjects found.</li>
+            {% endfor %}
+        </ul>
+
+        <h3 class="text-xl font-semibold mb-2">Back Papers:</h3>
+        <ul class="list-disc ml-5 mb-4 text-red-600">
+            {% for back in back_papers %}
+                <li>{{ back.subject_name }}</li>
+            {% empty %}
+                <li>No back papers.</li>
+            {% endfor %}
+        </ul>
+
+        <p class="text-lg font-semibold">Total Fee: ₹{{ total_amount }}</p>
+
+        <form method="POST" class="mt-6">
+            {% csrf_token %}
+            <button type="submit" class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded">
+                Submit Payment Request
+            </button>
+        </form>
+    </div>
+</body>
+</html>

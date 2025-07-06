@@ -1,0 +1,150 @@
+{% load static tailwind_tags %}
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Dashboard | Exam Management System{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'img/college_logo.png' %}">
+
+    <link rel="icon" type="image/png" href="{% static 'img/college_logo.png' %}">
+
+
+    
+    <!-- Include TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white flex flex-col min-h-screen">
+
+<!-- Navbar Start -->
+<nav class="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center space-x-4">
+          <img src="{% static 'img/college_logo.png' %}" alt="Logo" class="h-10 w-10 rounded-full">
+          <span class="text-2xl font-bold text-gray-900 dark:text-white">Student Dashboard</span>
+        </div>
+  
+<!-- Mobile menu toggle button -->
+<div class="md:hidden">
+    <button id="menu-toggle" class="relative w-8 h-8 flex flex-col justify-between items-center group">
+      <span class="block h-0.5 w-full bg-gray-800 dark:bg-white transform transition duration-300 origin-center" id="bar1"></span>
+      <span class="block h-0.5 w-full bg-gray-800 dark:bg-white transform transition duration-300 origin-center" id="bar2"></span>
+      <span class="block h-0.5 w-full bg-gray-800 dark:bg-white transform transition duration-300 origin-center" id="bar3"></span>
+    </button>
+  </div>
+  
+  
+  
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-4 items-center">
+          <a href="{% url 'generate_fee_receipt' %}" class="nav-link"> Fee pay</a>
+          <a href="{% url 'generate_admit_pdf' student.id %}" class="nav-link">Admit Card Pdf</a>
+          <a href="{% url 'student_admit_card' %}" class="nav-link">Admit Card</a>
+          <a href="{% url 'receipt_status' %}" class="nav-link">Receipt Status</a>
+          <a href="https://result.bteexam.com/Odd_Semester/main/" class="nav-link">Result</a>
+          <a href="{% url 'student_profile' %}" class="nav-link">Back</a>
+        </div>
+      </div>
+  
+<!-- Mobile menu -->
+<div id="mobile-menu" class="md:hidden absolute top-16 left-0 w-full bg-white dark:bg-gray-800 shadow-md transform scale-95 opacity-0 pointer-events-none transition duration-300 z-40">
+    <div class="flex flex-col space-y-2 p-4">
+      <a href="{% url 'generate_fee_receipt' %}" class="nav-link">Generate Fee Card</a>
+      <a href="{% url 'generate_admit_pdf' student.id %}" class="nav-link">Admit Card Pdf</a>
+      <a href="{% url 'student_admit_card' %}" class="nav-link">Admit Card</a>
+      <a href="{% url 'receipt_status' %}" class="nav-link">Receipt Status</a>
+      <a href="{% url 'student_profile' %}" class="nav-link">Back</a>
+    </div>
+  </div>
+  
+  <!-- Backdrop -->
+  <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-30 opacity-0 pointer-events-none z-30 transition-opacity duration-300"></div>
+  
+  
+  </nav>
+  
+<!-- Navbar End -->
+
+<!-- Main Content -->
+<main class="flex-grow container mx-auto p-6">
+    {% block content %}
+    
+    {% endblock %}
+</main>
+
+<!-- Toasts -->
+{% include 'includes/toasts.html' %}
+
+<!-- Footer -->
+<footer class="bg-black shadow-inner py-6">
+  <div class="container mx-auto text-center text-white text-sm space-y-1">
+      <p>© 2025 <span class="font-semibold text-gray-300">Exam Management System</span>. All Rights Reserved.</p>
+      <p class="text-gray-400 italic">Designed & Developed by <span class="text-blue-400 font-medium">Kishan Kumar</span> & <span class="text-blue-400 font-medium">Priyanshu Pandey</span></p>
+  </div>
+</footer>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    const menu = document.getElementById('mobile-menu');
+    const backdrop = document.getElementById('menu-backdrop');
+  
+    function openMenu() {
+      menu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+      menu.classList.add('opacity-100', 'scale-100');
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100');
+  
+      // Animate bars into X
+      bar1.classList.add('rotate-45', 'translate-y-2');
+      bar2.classList.add('opacity-0');
+      bar3.classList.add('-rotate-45', '-translate-y-2');
+    }
+  
+    function closeMenu() {
+      menu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+      menu.classList.remove('opacity-100', 'scale-100');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+      backdrop.classList.remove('opacity-100');
+  
+      // Reset bars
+      bar1.classList.remove('rotate-45', 'translate-y-2');
+      bar2.classList.remove('opacity-0');
+      bar3.classList.remove('-rotate-45', '-translate-y-2');
+    }
+  
+    menuToggle.addEventListener('click', () => {
+      if (menu.classList.contains('opacity-0')) {
+        openMenu();
+      } else {
+        closeMenu();
+      }
+    });
+  
+    backdrop.addEventListener('click', closeMenu);
+  
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
+  </script>
+    
+
+
+<style>
+    .nav-link {
+        @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition;
+    }
+</style>
+
+</body>
+</html>

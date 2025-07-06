@@ -1,0 +1,104 @@
+{% extends 'adminPanel/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Manage Institute | Admin Panel{% endblock %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto px-4 animate-fade-in-up">
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-2xl overflow-hidden transition-all duration-500">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 p-4 flex justify-between items-center rounded-t-2xl animate-slide-down">
+            <h2 class="text-xl font-bold text-white">Add New Institutes</h2>
+            <a href="{% url 'admin' %}" class="flex items-center gap-2 px-4 py-2 border border-indigo-700 text-white font-medium rounded-lg hover:bg-indigo-700 hover:text-white transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back
+            </a>
+        </div>
+
+        <!-- Form -->
+        <form id="add-institute-form" method="POST" class="p-6 space-y-6">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for field in form %}
+                    <div class="animate-fade-in">
+                        <label for="{{ field.id_for_label }}" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                            {{ field.label }}
+                        </label>
+                        <div class="relative">
+                            {{ field|add_class:"w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                            {% if field.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition-transform duration-300 hover:scale-105">
+                <i class="bi bi-plus-circle mr-2"></i> Add Institute
+            </button>
+        </form>
+    </div>
+
+    <!-- Table Section -->
+    <div class="mt-10 overflow-x-auto animate-fade-in-up">
+        <table class="w-full table-auto text-sm text-left shadow-md rounded-xl overflow-hidden">
+            <thead class="bg-gray-800 text-white text-center">
+                <tr>
+                    <th class="px-4 py-3">S.No</th>
+                    <th class="px-4 py-3">Code</th>
+                    <th class="px-4 py-3">Name</th>
+                    <th class="px-4 py-3">Action</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for inst in institutes %}
+                    <tr class="border-b hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300">
+                        <td class="px-4 py-3">{{ forloop.counter }}</td>
+                        <td class="px-4 py-3">{{ inst.code }}</td>
+                        <td class="px-4 py-3">{{ inst.name }}</td>
+                        <td class="px-4 py-3">
+                            
+                            <a href="#" data-delete-url="{% url 'delete_institute' inst.id %}" class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition-transform duration-300 hover:scale-110">
+                                <i class="bi bi-trash mr-2"></i> Delete
+
+                        </td>
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No institutes found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<style>
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slide-down {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in { animation: fade-in 0.5s ease-out; }
+    .animate-fade-in-up { animation: fade-in-up 0.6s ease-out; }
+    .animate-slide-down { animation: slide-down 0.5s ease-out; }
+    </style>
+    
+
+{% endblock %}

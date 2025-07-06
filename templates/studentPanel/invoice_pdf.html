@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invoice</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+        .header { text-align: center; font-size: 16px; font-weight: bold; }
+        .section { margin: 20px 0; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table td, .table th { border: 1px solid #000; padding: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">Fee Payment Invoice</div>
+    <div class="section">
+        <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
+        <p><strong>Name:</strong> {{ payment.student.name }}</p>
+        <p><strong>Enrollment:</strong> {{ payment.student.enrollment }}</p>
+        <p><strong>Branch:</strong> {{ payment.student.branch.full_name_branch }} ({{payment.student.branch.code}})</p>
+        <p><strong>Semester:</strong> {{ payment.student.semester }}</p>
+        <p><strong>Institute:</strong> {{ payment.student.college.full_name_institute }} ({{payment.student.college.code}})</p>
+        {% comment %} <p><strong>Paid on:</strong> {{ payment.created_at|date:"d M Y, h:i A" }}</p> {% endcomment %}
+        {% load tz %}
+        <p><strong>Paid on:</strong> {{ payment.created_at|date:"d M Y" }}</p>
+
+        <p><strong>Total Amount:</strong> Rs. {{ payment.amount|floatformat:2  }}</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,211 @@
+{% extends 'adminPanel/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto p-4 animate__animated animate__fadeInUp">
+
+  <!-- Card -->
+  <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden animate-fade-in-up">
+
+    <!-- Header -->
+    <div class="bg-blue-600 p-2 flex justify-between items-center rounded-t-2xl">
+      <!-- Title -->
+      <h4 class="text-xl font-bold text-white w-full text-center sm:text-left">🎓 Manage Student Back Subjects</h4>
+      
+      <!-- Back Button with Icon (Mobile Responsive) -->
+      <a href="{% url 'admin' %}" class="flex items-center gap-2 px-4 py-2 border border-indigo-700 text-white font-medium rounded-lg hover:bg-indigo-700 hover:text-white transition-all duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span class="hidden sm:inline">Back</span> <!-- Only show 'Back' text on small screens and up -->
+      </a>
+  </div>
+  
+
+    <!-- Form -->
+    <div class="p-6 space-y-6">
+      <h5 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Add Subject Details</h5>
+
+      <form method="post" class="grid md:grid-cols-5 gap-4">
+        {% csrf_token %}
+        
+        <div class="md:col-span-1">
+          <label class="block text-gray-700 dark:text-gray-300 mb-1 ">{{ form.enrollment.label }}</label>
+          {{ form.enrollment |add_class:"w-full border border-gray-300 rounded-lg p-2" }}
+          <datalist id="enrollments">
+            {% for student in students %}
+              <option value="{{ student.enrollment }}">{{ student.name }}</option>
+            {% endfor %}
+          </datalist>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-gray-700 dark:text-gray-300 mb-1 ">{{ form.subject.label }}</label>
+          {{ form.subject |add_class:"w-full border border-gray-300 rounded-lg p-2  dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+        </div>
+
+        <div class="md:col-span-1 flex items-end">
+          <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition duration-300">
+            <i class="bi bi-plus-circle mr-1"></i> Add
+          </button>
+        </div>
+
+        <div class="md:col-span-1 flex items-end">
+          <a href="{% url 'export_subjects_pdf' %}" class="px-3 bg-sky-500 hover:bg-sky-700 text-white-700 font-semibold py-2 rounded-lg transition duration-300">
+            📄 Export to PDF
+          </a>
+        </div>
+      </form>
+
+      <hr class="border-gray-300 dark:border-gray-600">
+
+      <!-- Search Form -->
+      <h5 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mt-6">Search Records</h5>
+
+      <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <!-- Filter Field Dropdown -->
+        <div>
+          <label for="filter_field" class="block mb-1 text-sm font-semibold text-gray-700 dark:text-white">Choose Field</label>
+          <select name="filter_field" id="filter_field" onchange="handleFilterChange()" 
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600">
+            <option value="">-- Choose Field --</option>
+            <option value="enrollment">Enrollment</option>
+            <option value="name">Name</option>
+            <option value="branch">Branch</option>
+            <option value="college">College</option>
+            <option value="semester">Semester</option>
+            <option value="subject">Subject</option>
+          </select>
+        </div>
+      
+        <!-- Dynamic Search Input -->
+        <div id="search_input_container" class="col-md-6 ">
+            <label for="search_value" class="block mb-1 text-sm font-semibold text-gray-700  dark:text-white">
+              Search Value
+            </label>
+        
+            <input type="text" name="search_value" id="search_value" 
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              placeholder="Enter search value">
+        </div>
+        
+      
+        <!-- Search Button -->
+        <div class="flex items-end">
+          <button type="submit" 
+            class=" flex items-center justify-center gap-2  bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:scale-105 hover:shadow-lg transition duration-300">
+            <i class="bi bi-search text-lg"></i> Search
+          </button>
+        </div>
+      </form>
+          
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white dark:bg-gray-700 rounded-lg overflow-hidden shadow-md">
+          <thead class="bg-gray-800 text-white text-center">
+            <tr>
+              <th class="px-4 py-2">S.No</th>
+              <th class="px-4 py-2">Enrollment No</th>
+              <th class="px-4 py-2">Name</th>
+              <th class="px-4 py-2">Branch</th>
+              <th class="px-4 py-2">College</th>
+              <th class="px-4 py-2">Semester</th>
+              <th class="px-4 py-2">Subject</th>
+              <th class="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="text-center text-gray-700 dark:text-gray-300">
+            {% for entry in data %}
+            <tr class="border-b hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">
+              <td class="px-4 py-3">{{ forloop.counter }}</td>
+              <td class="px-4 py-3">{{ entry.student.enrollment }}</td>
+              <td class="px-4 py-3">{{ entry.student.name }}</td>
+              <td class="px-4 py-3">{{ entry.student.branch.name }}</td>
+              <td class="px-4 py-3">{{ entry.student.college.name }}</td>
+              <td class="px-4 py-3">{{ entry.subject.semester }}</td>
+              <td class="px-4 py-3">{{ entry.subject.subject_name }}</td>
+              <td class="px-4 py-3">
+                <form id="delete-form-{{ entry.id }}" action="{% url 'delete_students_subjects' entry.id %}" method="post" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="button"  onclick="confirmDeleteSubject({{ entry.id }}, '{{ entry.subject.subject_name }}', '{{ entry.student.name }}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition-transform hover:scale-105">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="px-4 py-6 text-center text-gray-400">No subject data found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+</div>
+
+<!-- Selected searchField ko dynamically change krna -->
+<script>
+    const branches = {{ branches|safe }};
+    const colleges = {{ colleges|safe }};
+    const subjects = {{ subjects_list|safe }};
+    const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
+
+    function handleFilterChange() {
+        const field = document.getElementById('filter_field').value;
+        const searchValueInput = document.getElementById('search_value');
+        const currentValue = searchValueInput?.value || "";
+
+        const container = document.getElementById('search_input_container');
+
+        let inputElement = '';
+
+        if (field === 'branch' || field === 'college' || field === 'subject' || field === 'semester') {
+            let options = `<option value="">-- Select --</option>`;
+
+            if (field === 'branch') {
+                branches.forEach(branch => {
+                    options += `<option value="${branch.name}" ${branch.name === currentValue ? 'selected' : ''}>${branch.name}</option>`;
+                });
+            } else if (field === 'college') {
+                colleges.forEach(college => {
+                    options += `<option value="${college.name}" ${college.name === currentValue ? 'selected' : ''}>${college.name}</option>`;
+                });
+            } else if (field === 'subject') {
+                subjects.forEach(subject => {
+                    options += `<option value="${subject.subject_name}" ${subject.subject_name === currentValue ? 'selected' : ''}>${subject.subject_name}</option>`;
+                });
+            } else if (field === 'semester') {
+                semesters.forEach(sem => {
+                    options += `<option value="${sem}" ${sem === currentValue ? 'selected' : ''}>${sem}</option>`;
+                });
+            }
+
+            inputElement = `
+                <select name="search_value" id="search_value"
+                  class="w-full px-4 py-2 mt-5 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                  ${options}
+                </select>
+            `;
+        } else {
+            // Normal Text Input
+            inputElement = `
+                <input type="text" name="search_value" id="search_value"
+                  placeholder="Enter search value"
+                  class="w-full px-4 py-2 mt-5 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none">
+            `;
+        }
+
+        container.innerHTML = inputElement;
+    }
+</script>
+
+
+
+
+
+{% endblock %}

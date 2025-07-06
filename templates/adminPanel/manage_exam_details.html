@@ -1,0 +1,96 @@
+{% extends "adminPanel/base.html" %}
+{% block title %}Exam | Admit Card{% endblock %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md  dark:bg-gray-700">
+    <h2 class="text-2xl font-bold mb-4 text-center ">Add Exam Detail For Admit Card</h2>
+
+    <form method="post" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {% csrf_token %}
+      <div>
+        <label class="block font-semibold mb-1 ">Subject</label>
+        {{ form.subject|add_class:"w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400 dark:bg-gray-700" }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">Exam Date</label>
+        {{ form.exam_date|add_class:"w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400" }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">Start Time</label>
+        {{ form.start_time|add_class:"w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400" }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">End Time</label>
+        {{ form.end_time|add_class:"w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400" }}
+      </div>
+      <div class="sm:col-span-2 text-center">
+        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700">Add Exam</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="max-w-5xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-md dark:bg-gray-700">
+    <h2 class="text-xl font-semibold mb-3">All Exams</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full border text-sm">
+            <thead>
+                <tr class="bg-gray-200 dark:bg-gray-700">
+                    <th class="py-2 px-3 border">Subject</th>
+                    <th class="py-2 px-3 border">Date</th>
+                    <th class="py-2 px-3 border">Start Time</th>
+                    <th class="py-2 px-3 border">End Time</th>
+                    <th class="py-2 px-3 border">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in exam_details %}
+                <tr class="border-t text-center">
+                    <td class="py-2 px-3 border">{{ exam.subject.subject_name }}</td>
+                    <td class="py-2 px-3 border">{{ exam.exam_date }}</td>
+                    <td class="py-2 px-3 border">{{ exam.start_time }}</td>
+                    <td class="py-2 px-3 border">{{ exam.end_time }}</td>
+                    <td class="py-2 px-3 border text-center">
+                        <button 
+                            onclick="confirmDeleteExamDetail('{{ exam.id }}', '{{ exam.subject.subject_name }}', '{% url 'delete_exam_detail' exam.id %}')"
+                            class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full text-xl">
+                            <i class="bi bi-trash"></i> <!-- Bootstrap Trash Icon -->
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-3 text-gray-500 ">No exams added yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function confirmDeleteExamDetail(examId, subjectName, deleteUrl) {
+      Swal.fire({
+        title: 'Are you sure?',
+        html: `<b>${subjectName}</b> exam will be permanently deleted.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e3342f',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = deleteUrl;
+        }
+      });
+    }
+  </script>
+  
+
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'studentPanel/student_base.html' %}
+{% block title %}Admit Card{% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="bg-white max-w-4xl mx-auto border-2 border-black p-6">
+  <!-- Header with Logo and Title -->
+  <div class="text-center flex flex-col items-center justify-center space-y-4 sm:space-x-4 sm:flex-row">
+      <!-- Logo -->
+      <img src="{% static 'img/bteup.jpg'%}" alt="BTEUP Logo" class="h-16">
+      <div>
+          <h2 class="text-xl font-bold">BOARD OF TECHNICAL EDUCATION, LUCKNOW</h2>
+          <h3 class="text-lg mt-1">Admit Card for Examination</h3>
+      </div>
+  </div>
+
+  <!-- Student Info Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+      <!-- Student Info Column -->
+      <div class="text-sm space-y-2">
+          <div class="grid grid-cols-3">
+              <span class="font-semibold">Enrollment No</span>
+              <span class="col-span-2">: {{ student.enrollment }}</span>
+          </div>
+          <div class="grid grid-cols-3">
+              <span class="font-semibold">Name</span>
+              <span class="col-span-2">: {{ student.name }}</span>
+          </div>
+          <div class="grid grid-cols-3">
+              <span class="font-semibold">Branch</span>
+              <span class="col-span-2">: {{student.branch.code}} --- {{ student.branch.full_name_branch }}</span>
+          </div>
+          <div class="grid grid-cols-3">
+              <span class="font-semibold">Semester</span>
+              <span class="col-span-2">: {{ student.semester }}</span>
+          </div>
+          <div class="grid grid-cols-3">
+              <span class="font-semibold">Institute</span>
+              <span class="col-span-2">: {{student.college.code}} --- {{ student.college.full_name_institute }}</span>
+          </div>
+          <div class="grid grid-cols-3">
+              <span class="font-semibold">Exam Center </span>
+              <span class="col-span-2">: {{ admit.center_name }}</span>
+          </div>
+      </div>
+  
+      <!-- Photo and Signature Column -->
+      <div class="flex flex-col items-center gap-4">
+          <div class="text-center">
+              {% if student.profile_pic %}
+                  <img src="{{ student.profile_pic.url }}" class="h-28 w-28 object-cover border border-black ">
+              {% else %}
+                  <div class="h-28 w-28 border border-black rounded-full"></div>
+              {% endif %}
+          </div>
+      
+          {% comment %} <div class="text-center">
+              {% if student.signature %}
+                  <img src="{{ student.signature.url }}" class="h-16 w-28 object-contain border border-black">
+              {% else %}
+                  <div class="h-10 w-28 border border-black"></div>
+              {% endif %}
+          </div> {% endcomment %}
+      </div>
+  </div>
+</div>
+
+  <!-- Students Regular subjects Table -->
+  <div class="overflow-x-auto shadow-lg max-w-4xl mx-auto border-2 border-black">
+    <table class="table-auto w-full text-sm text-center border-separate border-spacing-2">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="px-4 py-2">Paper Code</th>
+          <th class="px-4 py-2">Paper Name</th>
+          <th class="px-4 py-2">Date</th>
+          <th class="px-4 py-2">Timing</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-700">
+        {% for exam  in exam_details  %}
+          <tr class="border-b hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">
+            <td class="px-4 py-2">{{ exam.subject.subject_code }}</td>
+            <td class="px-4 py-2">{{ exam.subject.subject_name }}</td>
+            <td class="px-4 py-2">{{ exam.exam_date }}</td>
+            <td class="px-4 py-2">{{ exam.exam_time }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-gray-500 py-4">No Subjects found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- Students Back Paper Subjects Table -->
+  {% if back_paper_details %}
+
+  <div class="overflow-x-auto shadow-lg max-w-4xl mx-auto border-2 border-black">
+    <h3 class="px-3 py-2 font-bold">Back Papers</h3>
+
+    <table class="table-auto w-full text-sm text-center border-separate border-spacing-2">
+      
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="px-4 py-2">Paper Code</th>
+          <th class="px-4 py-2">Paper Name</th>
+          <th class="px-4 py-2">Date</th>
+          <th class="px-4 py-2">Timing</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-700">
+        {% for paper in back_paper_details %}
+          <tr class="border-b hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">
+            <td class="px-4 py-2">{{ paper.subject.subject_code }}</td>
+            <td class="px-4 py-2">{{ paper.subject.subject_name }}</td>
+            <td class="px-4 py-2">{{ paper.exam_date  }}</td>
+            <td class="px-4 py-2">{{ paper.exam_time  }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-gray-500 py-4">No Subjects found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <div class="overflow-x-auto shadow-lg max-w-4xl mx-auto border-2 border-black ">
+
+    <table class="table-auto w-full text-sm text-center border-separate border-spacing-2 mb-20">
+      
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="px-4 py-2 ">Principal Signature & Seal</th>
+          <th class="px-4 py-2">Student Signature in presence of Principal / Authorized Officer</th>
+        </tr>
+      </thead>
+      
+    </table>
+    </div>
+  </div>
+
+{% endblock %}

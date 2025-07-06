@@ -1,0 +1,91 @@
+{% extends 'studentPanel/student_base.html' %}
+{% load static %}
+{% block title %}Fee Invoice{% endblock %}
+
+{% block content %}
+
+<!-- MAIN INVOICE CONTENT -->
+<div class="max-w-3xl mx-auto bg-white p-6 sm:p-8 border border-gray-300 rounded shadow-md text-gray-800">
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b pb-4 mb-6 space-y-4 sm:space-y-0">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Fee Invoice</h1>
+        <div class="text-sm sm:text-right">
+            <p><strong>Enrollment:</strong> {{ student.enrollment }}</p>
+            <p><strong>Semester:</strong> {{ student.semester }}</p>
+        </div>
+    </div>
+
+    <!-- Student Details -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mb-6">
+        <div>
+            <p><strong>Name:</strong> {{ student.name }}</p>
+            <p><strong>Branch:</strong> {{ student.branch.full_name_branch }} ({{ student.branch.code }})</p>
+        </div>
+        <div>
+            <p><strong>Institute:</strong> {{ student.college.full_name_institute }}</p>
+            {% if last_receipt %}
+                <p><strong>Transaction ID:</strong> {{ last_receipt.transaction_id }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Subjects -->
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold border-b pb-1 mb-2">Subjects</h2>
+        <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+            {% for subject in subjects %}
+                <li>{{ subject.subject_code }} - {{ subject.subject_name }}</li>
+            {% empty %}
+                <li>No subjects found</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <!-- Back Papers -->
+    {% if back_papers %}
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold border-b pb-1 mb-2 text-red-600">Back Papers</h2>
+        <ol class="list-decimal list-inside text-sm text-red-700 space-y-1">
+            {% for back in back_papers %}
+                <li>{{ back.subject.subject_code }} - {{ back.subject.subject_name }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% endif %}
+
+    <!-- Fee Summary -->
+    <div class="border-t pt-4 mt-6 text-sm space-y-1">
+        <div class="flex justify-between">
+            <span>Back Paper Fee:</span>
+            <span>₹{{ backPaper_fee }}</span>
+        </div>
+        <div class="flex justify-between font-bold text-lg mt-2">
+            <span>Total Payable:</span>
+            <span>₹{{ total_fee }}</span>
+        </div>
+    </div>
+
+    <!-- Payment Section -->
+    {% if back_papers %}
+        {% if not last_receipt %}
+            <form method="POST" class="mt-8 text-center">
+                {% csrf_token %}
+                <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded shadow">
+                    Pay and Submit
+                </button>
+            </form>
+        {% else %}
+            <div class="mt-6 text-center text-blue-600 font-medium text-sm sm:text-base">
+                Payment already submitted.<br>
+                Transaction ID: <strong>{{ last_receipt.transaction_id }}</strong>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="mt-6 text-center text-gray-500 italic text-sm">
+            No back papers — No payment required.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

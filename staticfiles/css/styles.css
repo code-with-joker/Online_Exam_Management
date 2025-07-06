@@ -1,0 +1,12 @@
+/* styles.css */
+
+/* Tailwind CSS Base styles */
+@tailwind base;
+
+/* Tailwind CSS Components */
+@tailwind components;
+
+/* Tailwind CSS Utilities */
+@tailwind utilities;
+
+/* Custom CSS (Optional: Add your custom styles here) */
